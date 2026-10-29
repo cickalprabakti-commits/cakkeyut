@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pesan Cake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF7F6;--card:#fff;--ink:#2B1B22;--mute:#7A6870;--line:#EBDDE0;--berry:#A3214F;--berry-d:#7E1639;--pist:#E3EED9;--pist-ink:#2F5A1E;--warn:#FCEBEB;--warn-ink:#8A1F1F}
+*{box-sizing:border-box}
+body{margin:0;background:#EFE7E8;color:var(--ink);font:400 15px/1.5 "DM Sans",system-ui,sans-serif}
+#app{max-width:440px;min-height:100vh;margin:0 auto;background:var(--bg);position:relative;display:flex;flex-direction:column}
+h1,h2,h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;margin:0}
+h1{font-size:28px;line-height:1.15}h2{font-size:22px}h3{font-size:17px}
+p{margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:5}
+.brand{font:400 20px "DM Serif Display",Georgia,serif;color:var(--berry)}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:5px 12px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+.chip.on{background:var(--berry);border-color:var(--berry);color:#fff}
+main{flex:1;padding:16px}
+.btn{display:block;width:100%;border:0;border-radius:10px;background:var(--berry);color:#fff;font:500 15px "DM Sans",sans-serif;padding:13px;cursor:pointer;text-align:center;text-decoration:none}
+.btn:hover{background:var(--berry-d)}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.alt:hover{background:var(--card)}
+.btn.wa{background:var(--pist);color:var(--pist-ink)}
+.btn.wa:hover{background:#d5e6c8}
+input,select,textarea{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+label{display:block;font-size:13px;color:var(--mute);margin:14px 0 5px}
+:focus-visible{outline:2px solid var(--berry);outline-offset:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit}
+.pc .im{background:#F4E8EA;padding:10px 14px}
+.pc .bd{padding:10px 12px 12px}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--pist);color:var(--pist-ink)}
+.tag.po{background:#F6E3EA;color:var(--berry-d)}
+.mute{color:var(--mute);font-size:13px}
+.row{display:flex;gap:8px;align-items:center}
+.sp{justify-content:space-between}
+.wrap{display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stack>*+*{margin-top:12px}
+.err{background:var(--warn);color:var(--warn-ink);padding:10px 12px;border-radius:10px;font-size:14px}
+.ok{background:var(--pist);color:var(--pist-ink);padding:10px 12px;border-radius:10px;font-size:14px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.qty button{border:0;background:none;font-size:18px;width:34px;height:34px;cursor:pointer;color:var(--ink)}
+.qty span{min-width:24px;text-align:center}
+nav{position:sticky;bottom:0;display:flex;justify-content:space-around;background:var(--card);border-top:1px solid var(--line);padding:8px 0 10px}
+nav a{background:none;border:0;font:inherit;font-size:12px;color:var(--mute);cursor:pointer;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 10px}
+nav a.on{color:var(--berry);font-weight:500}
+nav b{font-weight:500}
+.msg{white-space:pre-wrap;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px;color:var(--mute)}
+svg{display:block;width:100%;height:auto}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============ KONFIGURASI: UBAH BAGIAN INI ============ */
+const CONFIG = {
+  NAMA_TOKO: 'Toko Cake Kamu',
+  ADMIN_WA: '6281234567890',          // nomor admin, format 62 tanpa + dan tanpa 0 di depan
+  ONGKIR: 5000,                       // ongkir antar (flat)
+  AREAS: ['Kecamatan A', 'Kecamatan B', 'Kecamatan C'],
+  JAM: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00']
+};
+const PRODUCTS = [
+  {id:1,name:'Choco Fudge Cake',cat:'Ulang tahun',lead:2,write:true,desc:'Cokelat pekat dengan lapisan ganache.',
+   sizes:[{l:'15 cm',p:150000},{l:'18 cm',p:200000},{l:'20 cm',p:250000}],flavors:['Cokelat','Mocha'],c:['#5B3A2E','#7A4F3E','#A3214F']},
+  {id:2,name:'Red Velvet Cream',cat:'Ulang tahun',lead:2,write:true,desc:'Lembut, dengan krim keju tipis.',
+   sizes:[{l:'15 cm',p:165000},{l:'18 cm',p:215000},{l:'20 cm',p:265000}],flavors:['Red velvet'],c:['#B4233F','#F6EAEA','#7E1639']},
+  {id:3,name:'Strawberry Tart',cat:'Tart',lead:1,write:false,desc:'Kulit tart renyah, custard, stroberi segar.',
+   sizes:[{l:'Mini 10 cm',p:90000},{l:'18 cm',p:180000}],flavors:[],c:['#D9A66B','#F4DCA8','#D4364E']},
+  {id:4,name:'Fudgy Brownies',cat:'Brownies',lead:0,write:false,desc:'Padat dan lumer. Tersedia setiap hari.',
+   sizes:[{l:'Box isi 9',p:85000},{l:'Box isi 16',p:140000}],flavors:['Original','Almond'],c:['#3E2A22','#4F362C','#8C5A44']},
+  {id:5,name:'Lemon Cheesecake',cat:'Tart',lead:1,write:false,desc:'Asam segar di atas dasar biskuit mentega.',
+   sizes:[{l:'15 cm',p:140000},{l:'18 cm',p:190000}],flavors:[],c:['#E8C96A','#F7EBC0','#F2D86B']}
+];
+const CATS = ['Semua','Ulang tahun','Tart','Brownies'];
+
+/* ============ STATE ============ */
+const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let S={user:load('user',null),area:load('area',null),cart:load('cart',[]),orders:load('orders',[]),
+  cat:'Semua',pid:null,sel:null,err:'',oid:null,view:'',
+  co:{mode:'antar',date:'',time:'09:00',addr:'',pay:'Transfer bank',note:''}};
+S.view=!S.area?'area':!S.user?'user':'home';
+
+/* ============ HELPER ============ */
+const $=s=>document.querySelector(s);
+const rp=n=>'Rp '+Number(n).toLocaleString('id-ID');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P=id=>PRODUCTS.find(p=>p.id===id);
+const wa=t=>`https://wa.me/${CONFIG.ADMIN_WA}?text=${encodeURIComponent(t)}`;
+const itemPrice=i=>P(i.pid).sizes[i.size].p*i.qty;
+const subtotal=()=>S.cart.reduce((a,i)=>a+itemPrice(i),0);
+const count=()=>S.cart.reduce((a,i)=>a+i.qty,0);
+const pad=n=>String(n).padStart(2,'0');
+const fmtDate=s=>new Date(s+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function minDate(){
+  const lead=Math.max(0,...S.cart.map(i=>P(i.pid).lead));
+  const d=new Date();d.setDate(d.getDate()+lead);
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+function cake(c){
+  return `<svg viewBox="0 0 120 90" aria-hidden="true"><ellipse cx="60" cy="80" rx="48" ry="6" fill="#00000014"/><rect x="22" y="48" width="76" height="28" rx="6" fill="${c[0]}"/><rect x="30" y="26" width="60" height="24" rx="6" fill="${c[1]}"/><path d="M30 34h60v6c-5 0-5 8-10 8s-5-6-10-6-5 8-10 8-5-8-10-8-5 6-10 6z" fill="${c[2]}" opacity=".9"/><circle cx="60" cy="20" r="5" fill="${c[2]}"/></svg>`;
+}
+function go(v){S.view=v;S.err='';render();window.scrollTo(0,0)}
+const errBox=()=>S.err?`<div class="err" role="alert">${esc(S.err)}</div>`:'';
+
+/* ============ TAMPILAN ============ */
+function header(){
+  if(['area','user'].includes(S.view))return `<div class="top"><span class="brand">${esc(CONFIG.NAMA_TOKO)}</span></div>`;
+  const back=['detail','checkout','done'].includes(S.view);
+  return `<div class="top">
+    ${back?`<button class="chip" onclick="go('${S.view==='detail'?'home':S.view==='checkout'?'cart':'home'}')">Kembali</button>`:`<span class="brand">${esc(CONFIG.NAMA_TOKO)}</span>`}
+    <button class="chip" onclick="go('area')">${esc(S.area)}</button></div>`;
+}
+function nav(){
+  const it=(v,l,extra='')=>`<a href="#" class="${S.view===v?'on':''}" onclick="go('${v}');return false">${extra}${l}</a>`;
+  return `<nav>${it('home','Beranda')}${it('cart','Keranjang',count()?`<b>${count()}</b>`:'')}${it('orders','Pesanan')}<a href="${wa('Halo admin, saya mau tanya.')}" target="_blank" rel="noopener">Admin</a></nav>`;
+}
+const VIEWS={
+area(){
+  return `<div class="stack"><div style="background:#F4E8EA;border-radius:14px;padding:18px 40px">${cake(['#A3214F','#F6EAEA','#7E1639'])}</div>
+  <h1>Kamu di area mana?</h1><p class="mute">Kami hanya mengantar ke area tertentu. Pilih areamu untuk melihat menu.</p>
+  <select id="areaSel" aria-label="Pilih area">${CONFIG.AREAS.map(a=>`<option ${a===S.area?'selected':''}>${esc(a)}</option>`).join('')}<option value="luar">Area lain</option></select>
+  <div id="areaMsg"></div><button class="btn" onclick="pickArea()">Cek jangkauan</button></div>`;
+},
+user(){
+  return `<div class="stack"><div class="ok">Area ${esc(S.area)} terjangkau.</div><h1>Siapa namamu?</h1>
+  <p class="mute">Nama dan nomor HP dipakai admin untuk menghubungimu soal pesanan.</p>
+  ${errBox()}<div><label for="nm">Nama</label><input id="nm" autocomplete="name" placeholder="Nama lengkap">
+  <label for="hp">Nomor HP</label><input id="hp" inputmode="tel" autocomplete="tel" placeholder="08123456789"></div>
+  <button class="btn" onclick="saveUser()">Mulai pesan</button></div>`;
+},
+home(){
+  const list=PRODUCTS.filter(p=>S.cat==='Semua'||p.cat===S.cat);
+  return `<div class="stack"><h2>Pilih cake</h2>
+  <div class="wrap">${CATS.map(c=>`<button class="chip ${S.cat===c?'on':''}" onclick="S.cat='${c}';render()">${c}</button>`).join('')}</div>
+  <div class="grid">${list.map(p=>`<button class="pc" onclick="openP(${p.id})"><div class="im">${cake(p.c)}</div><div class="bd">
+   <span class="tag ${p.lead?'po':''}">${p.lead?'Pre-order H-'+p.lead:'Siap hari ini'}</span>
+   <h3 style="margin-top:6px">${esc(p.name)}</h3><div class="mute">mulai ${rp(p.sizes[0].p)}</div></div></button>`).join('')}</div></div>`;
+},
+detail(){
+  const p=P(S.pid),s=S.sel,price=p.sizes[s.size].p*s.qty;
+  return `<div class="stack"><div style="background:#F4E8EA;border-radius:14px;padding:14px 60px">${cake(p.c)}</div>
+  <div><h2>${esc(p.name)}</h2><p class="mute">${esc(p.desc)}</p></div>
+  <span class="tag ${p.lead?'po':''}">${p.lead?'Pre-order, pesan minimal H-'+p.lead:'Siap hari ini'}</span>
+  <div><div class="mute">Ukuran</div><div class="wrap" style="margin-top:6px">${p.sizes.map((z,i)=>`<button class="chip ${s.size===i?'on':''}" onclick="S.sel.size=${i};render()">${z.l} - ${rp(z.p)}</button>`).join('')}</div></div>
+  ${p.flavors.length?`<div><div class="mute">Rasa</div><div class="wrap" style="margin-top:6px">${p.flavors.map((f,i)=>`<button class="chip ${s.flavor===i?'on':''}" onclick="S.sel.flavor=${i};render()">${f}</button>`).join('')}</div></div>`:''}
+  ${p.write?`<div><label for="tt" style="margin-top:0">Tulisan di kue (opsional)</label><input id="tt" maxlength="40" value="${esc(s.text)}" oninput="S.sel.text=this.value" placeholder="Selamat ulang tahun, Ani"></div>`:''}
+  <div class="row sp"><div class="qty"><button onclick="selQty(-1)" aria-label="Kurangi">-</button><span>${s.qty}</span><button onclick="selQty(1)" aria-label="Tambah">+</button></div><b>${rp(price)}</b></div>
+  <button class="btn" onclick="addCart()">Tambah ke keranjang</button></div>`;
+},
+cart(){
+  if(!S.cart.length)return `<div class="stack" style="text-align:center;padding-top:40px"><h2>Keranjangmu kosong</h2><p class="mute">Pilih cake dulu, nanti muncul di sini.</p><button class="btn" onclick="go('home')">Lihat menu</button></div>`;
+  return `<div class="stack"><h2>Keranjang</h2>
+  ${S.cart.map((i,k)=>{const p=P(i.pid);return `<div class="card"><div class="row sp"><b>${esc(p.name)}</b><button class="chip" onclick="cartDel(${k})">Hapus</button></div>
+   <div class="mute">${p.sizes[i.size].l}${p.flavors.length?', '+esc(p.flavors[i.flavor]):''}${i.text?'<br>Tulisan: "'+esc(i.text)+'"':''}</div>
+   <div class="row sp" style="margin-top:8px"><div class="qty"><button onclick="cartQty(${k},-1)" aria-label="Kurangi">-</button><span>${i.qty}</span><button onclick="cartQty(${k},1)" aria-label="Tambah">+</button></div><b>${rp(itemPrice(i))}</b></div></div>`}).join('')}
+  <div class="row sp"><span class="mute">Subtotal</span><b>${rp(subtotal())}</b></div>
+  <p class="mute">Ongkir antar ${rp(CONFIG.ONGKIR)}, dihitung saat checkout.</p>
+  <button class="btn" onclick="go('checkout')">Lanjut checkout</button></div>`;
+},
+checkout(){
+  const c=S.co,ong=c.mode==='antar'?CONFIG.ONGKIR:0,min=minDate();
+  return `<div class="stack"><h2>Checkout</h2>${errBox()}
+  <div class="wrap"><button class="chip ${c.mode==='antar'?'on':''}" onclick="setMode('antar')">Antar +${rp(CONFIG.ONGKIR)}</button><button class="chip ${c.mode==='ambil'?'on':''}" onclick="setMode('ambil')">Ambil sendiri</button></div>
+  <div><label for="dt" style="margin-top:0">Tanggal (paling cepat ${fmtDate(min)})</label><input id="dt" type="date" min="${min}" value="${c.date}" onchange="S.co.date=this.value">
+  <label for="tm">Jam</label><select id="tm" onchange="S.co.time=this.value">${CONFIG.JAM.map(j=>`<option ${c.time===j?'selected':''}>${j}</option>`).join('')}</select></div>
+  ${c.mode==='antar'?`<div><label for="ad" style="margin-top:0">Alamat pengantaran</label><textarea id="ad" rows="3" oninput="S.co.addr=this.value" placeholder="Jalan, nomor rumah, patokan">${esc(c.addr)}</textarea></div>`:`<div class="ok">Ambil di toko pada tanggal dan jam di atas. Admin akan memberi alamat toko lewat WhatsApp.</div>`}
+  <div><div class="mute">Pembayaran</div>${['Transfer bank','QRIS','Bayar di tempat'].map(m=>`<label style="display:flex;gap:8px;align-items:center;margin:8px 0;color:var(--ink);font-size:15px"><input type="radio" name="pay" style="width:auto" ${c.pay===m?'checked':''} onchange="S.co.pay='${m}'">${m}</label>`).join('')}</div>
+  <div><label for="ct" style="margin-top:0">Catatan untuk admin (opsional)</label><input id="ct" value="${esc(c.note)}" oninput="S.co.note=this.value"></div>
+  <div class="card"><div class="row sp"><span class="mute">Subtotal</span><span>${rp(subtotal())}</span></div><div class="row sp"><span class="mute">Ongkir</span><span>${rp(ong)}</span></div><div class="row sp"><b>Total</b><b>${rp(subtotal()+ong)}</b></div></div>
+  <button class="btn" onclick="placeOrder()">Pesan dan kirim ke admin</button></div>`;
+},
+done(){
+  const o=S.orders.find(x=>x.id===S.oid);
+  return `<div class="stack"><div class="ok">Pesanan #${o.id} dibuat. Kirim pesan di WhatsApp supaya admin langsung memprosesnya.</div>
+  <h2>Pesan untuk admin</h2><div class="msg">${esc(o.msg)}</div>
+  <a class="btn wa" href="${wa(o.msg)}" target="_blank" rel="noopener">Buka WhatsApp admin</a>
+  <button class="btn" onclick="go('orders')">Lihat pesananku</button><button class="btn alt" onclick="go('home')">Kembali ke beranda</button></div>`;
+},
+orders(){
+  if(!S.orders.length)return `<div class="stack" style="text-align:center;padding-top:40px"><h2>Belum ada pesanan</h2><p class="mute">Pesananmu akan tampil di sini.</p><button class="btn" onclick="go('home')">Lihat menu</button></div>`;
+  return `<div class="stack"><h2>Pesananku</h2>${S.orders.map(o=>{
+   const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(o.addr+' '+o.area);
+   return `<div class="card stack"><div class="row sp"><b>#${o.id}</b><span class="tag po">Menunggu konfirmasi admin</span></div>
+   <div class="mute">${o.items.map(i=>i.qty+'x '+esc(P(i.pid).name)).join(', ')}<br>${o.mode==='antar'?'Antar':'Ambil sendiri'}, ${fmtDate(o.date)} pukul ${o.time}<br>Total ${rp(o.total)} (${o.pay})</div>
+   <a class="btn wa" href="${wa('Halo admin, saya mau tanya pesanan #'+o.id)}" target="_blank" rel="noopener">Hubungi admin</a>
+   ${o.mode==='antar'?`<a class="btn alt" href="${wa('Halo admin, mohon bagikan lokasi pengantar untuk pesanan #'+o.id)}" target="_blank" rel="noopener">Minta lokasi pengantar</a>
+   <a class="btn alt" href="${maps}" target="_blank" rel="noopener">Lihat alamat di Google Maps</a>`:''}</div>`}).join('')}</div>`;
+}};
+function render(){
+  $('#app').innerHTML=header()+'<main>'+VIEWS[S.view]()+'</main>'+(['home','cart','orders'].includes(S.view)?nav():'');
+}
+
+/* ============ AKSI ============ */
+function pickArea(){
+  const v=$('#areaSel').value;
+  if(v==='luar'){
+    $('#areaMsg').innerHTML=`<div class="err">Belum menjangkau areamu. <a href="${wa('Halo admin, saya ingin masuk daftar tunggu untuk area saya.')}" target="_blank" rel="noopener" style="color:inherit">Kabari admin lewat WhatsApp</a> untuk masuk daftar tunggu.</div>`;return;
+  }
+  S.area=v;save('area',v);go(S.user?'home':'user');
+}
+function saveUser(){
+  const nm=$('#nm').value.trim(),hp=$('#hp').value.replace(/\D/g,'');
+  if(nm.length<2||hp.length<9||hp.length>14){S.err='Isi nama dan nomor HP yang valid.';render();return}
+  S.user={nm,hp};save('user',S.user);go('home');
+}
+function openP(id){S.pid=id;S.sel={size:0,flavor:0,text:'',qty:1};go('detail')}
+function selQty(d){S.sel.qty=Math.max(1,S.sel.qty+d);render()}
+function addCart(){
+  const s=S.sel,ex=S.cart.find(i=>i.pid===S.pid&&i.size===s.size&&i.flavor===s.flavor&&i.text===s.text.trim());
+  if(ex)ex.qty+=s.qty;else S.cart.push({pid:S.pid,size:s.size,flavor:s.flavor,text:s.text.trim(),qty:s.qty});
+  save('cart',S.cart);go('cart');
+}
+function cartQty(k,d){S.cart[k].qty=Math.max(1,S.cart[k].qty+d);save('cart',S.cart);render()}
+function cartDel(k){S.cart.splice(k,1);save('cart',S.cart);render()}
+function setMode(m){S.co.mode=m;render()}
+function placeOrder(){
+  const c=S.co,min=minDate();
+  if(!c.date||c.date<min){S.err='Pilih tanggal mulai '+fmtDate(min)+' atau sesudahnya.';render();return}
+  if(c.mode==='antar'&&c.addr.trim().length<8){S.err='Isi alamat pengantaran dengan lengkap.';render();return}
+  const ong=c.mode==='antar'?CONFIG.ONGKIR:0,sub=subtotal(),total=sub+ong;
+  const id='CK'+String(Date.now()).slice(-6);
+  const lines=S.cart.map(i=>{const p=P(i.pid);
+    return `- ${i.qty}x ${p.name} (${p.sizes[i.size].l}${p.flavors.length?', '+p.flavors[i.flavor]:''})${i.text?' tulisan "'+i.text+'"':''} = ${rp(itemPrice(i))}`}).join('\n');
+  const msg=`Halo admin, saya mau pesan.\nPesanan #${id}\n${lines}\n\nSubtotal: ${rp(sub)}\nOngkir: ${rp(ong)}\nTotal: ${rp(total)}\n\nMetode: ${c.mode==='antar'?'Antar':'Ambil sendiri'}\nJadwal: ${fmtDate(c.date)} pukul ${c.time}\n`
+   +(c.mode==='antar'?`Alamat: ${c.addr.trim()}\n`:'')+`Area: ${S.area}\nPembayaran: ${c.pay}\n`+(c.note.trim()?`Catatan: ${c.note.trim()}\n`:'')+`Nama: ${S.user.nm}\nHP: ${S.user.hp}`;
+  S.orders.unshift({id,items:JSON.parse(JSON.stringify(S.cart)),mode:c.mode,date:c.date,time:c.time,addr:c.addr.trim(),area:S.area,pay:c.pay,total,msg});
+  save('orders',S.orders);S.cart=[];save('cart',S.cart);S.oid=id;
+  S.co={mode:c.mode,date:'',time:'09:00',addr:c.addr,pay:c.pay,note:''};
+  window.open(wa(msg),'_blank');
+  go('done');
+}
+render();
+</script>
+</body>
+</html>
